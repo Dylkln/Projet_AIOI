@@ -2,7 +2,7 @@
 
 ## Prérequis
 
-L'utilisation de [Miniconda3](https://docs.conda.io/en/latest/miniconda.html) est fortement recommandée pour l'utilisation du programme de threading.
+L'utilisation de [Miniconda3](https://docs.conda.io/en/latest/miniconda.html) est fortement recommandée pour l'utilisation du programme de Deep Learning.
 
 ## Quick start
 
@@ -44,7 +44,7 @@ MAURY Léo: leomaury97@gmail.com
 
 PICHON Julien: julien.pichon@cri-paris.org
 
-Uniersité de Paris M2-BI
+Université de Paris M2-BI
 
 ## Date
 
