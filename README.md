@@ -1,5 +1,7 @@
 # Projet AIOI
 
+https://www.kaggle.com/c/stanford-covid-vaccine
+
 ## Prérequis
 
 L'utilisation de [Miniconda3](https://docs.conda.io/en/latest/miniconda.html) est fortement recommandée pour l'utilisation du programme de Deep Learning.
