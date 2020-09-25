@@ -10,19 +10,27 @@ L'utilisation de [Miniconda3](https://docs.conda.io/en/latest/miniconda.html) es
 
 > Lien HTTPS
 
+```
 git clone https://github.com/Dylkln/Projet_AIOI.git
+```
 
 > Lien SSH
 
+```
 git clone git@github.com:Dylkln/Projet_AIOI.git
+```
 
 2. Initialiser l'environnement conda à partir du fichier *environment.yml*
 
+```
 conda env create --file environment.yml
+```
 
 3. Activer l'environnement conda
 
+```
 conda activate deep-learning
+```
 
 ## Auteurs
 
