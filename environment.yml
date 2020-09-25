@@ -1,0 +1,4 @@
+name: ENVNAME
+channels:
+  - defaults
+prefix: /home/damase/miniconda3/envs/ENVNAME
