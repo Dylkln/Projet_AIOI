@@ -15,7 +15,7 @@ import numpy as np
 import sys
 
 
-def valide_file(fichier, path):
+def valide_file(fichier):
     """Vérifie que le fichier lu est valide.
 
     I.E:
@@ -25,8 +25,6 @@ def valide_file(fichier, path):
     ---------
     fichier: str
         le nom du fichier
-    path: str
-        le path du fichier
 
     Return
     ------
@@ -34,7 +32,7 @@ def valide_file(fichier, path):
       - True: fichier valide
       - False: fichier non valide
     """
-    if os.path.exists(path + fichier):
+    if os.path.exists(fichier):
         return True
     return False
 
@@ -53,13 +51,11 @@ def read_json(fichier):
     json_file: pandas data frame
         les données
     """
-    path = "../Data/"
-    if valide_file(fichier , path):
-        json_file = pd.read_json(path + fichier, lines=True)
+    if valide_file(fichier):
+        json_file = pd.read_json(fichier, lines=True)
         return json_file
     else:
-        raise Exception('{} doit être présent dans le répertoire {}'
-                        .format(fichier, path))
+        raise Exception('{} est absent'.format(fichier))
 
 
 def read_npy(fichier):
@@ -77,7 +73,7 @@ def read_npy(fichier):
         les données
     """
     path = "../Data/Files/"
-    if valide_file(fichier, path):
+    if valide_file(path + fichier):
         npy_file = np.load(path + fichier)
         return npy_file
     else:
