@@ -38,7 +38,7 @@ conda activate deep-learning
 
 BODIN Raphaël: bodin.raphael85@gmail.com
 
-IMBERT Pierre: pierre.damase.mbert@gmail.com
+IMBERT Pierre
 
 KLEIN Dylan: klein.dylan@outlook.com
 
