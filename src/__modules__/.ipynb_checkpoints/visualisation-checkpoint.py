@@ -42,13 +42,6 @@ def summarize_model(history, suptitle):
 
     plt.show()
     plt.clf()
-
-
-def plot_neural_network(model):
-    """
-    
-    """
-    plot_model(model)
     
     
 if __name__ == "__main__":
