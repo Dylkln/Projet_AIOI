@@ -335,5 +335,35 @@ def check(index):
     print("{} / 8".format(index+1))
 
 
+def apprentissage(x_train, y_train):
+    """
+    Apprentissage des différents réseaux de neurones après optimisation & validation.
+    """
+    # Shape des data en entrée
+    input_shape = (107,14)
+
+    # Liste des modèles utilisés
+    list_model = [model_simple, model_resnet_10, model_compact_data,
+                  model_scatter_data, model_inception, model_resnext]
+
+    # Learing rate optimisé pour chaque modèle
+    learning_rate = [1E-2, 1E-6, 1E-1, 1E-2, 1E-2, 1E-2]
+
+    history, models = {}, {}
+
+    for index, model in enumerate(list_model):
+        print("\n#####\n{}\n#####".format(model.__name__))
+        time.sleep(30)
+
+        mdl = model(input_shape, learning_rate[index])
+        fit = mdl.fit(x=x_train, y=y_train, epochs=175, batch_size=10, verbose=1,
+                      validation_split=0.2)
+
+        history[model.__name__] = fit.history
+        models[model.__name__] = mdl
+
+    return history, models
+
+
 if __name__ == "__main__":
     sys.exit()  # Aucune action souhaitée

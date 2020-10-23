@@ -77,5 +77,18 @@ def read_npy(fichier):
         return npy_file
 
 
+def load_keras_models():
+    """
+    Faire pour chaque fichier .h5 le load et l'ajouter dans un dictionnaire de type:
+    {Type_model: model}
+    """
+    pass
+
+
+def load_history():
+    file_ = "./Models/models_history.npy"
+    return np.load(file_, allow_pickle=True).items
+
+
 if __name__ == "__main__":
     sys.exit()  # Aucune action souhaitée

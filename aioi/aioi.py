@@ -89,10 +89,18 @@ def main():
 
         sf.save_scores(scores)
 
+    elif args.analyse == "a":
+        print("###########")
+        print("# Apprentissage des modèles")
+        print("###########", end="\n\n")
+
+        history, keras_models = mdl.apprentissage(x_train, y_train)
+
+        sf.save_history(history)
+        sf.save_keras_models(keras_models)
+
 
     # Rajouter prédict: https://machinelearningmastery.com/how-to-make-classification-and-regression-predictions-for-deep-learning-models-in-keras/
-    # Plus save modele: https://machinelearningmastery.com/save-load-keras-deep-learning-models/
-
 
 
 if __name__ == "__main__":
