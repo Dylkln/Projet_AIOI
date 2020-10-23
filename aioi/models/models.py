@@ -320,7 +320,7 @@ def repeated_kfold_validation(X, Y):
 
             mdl = model(input_shape, learning_rate[index])
             fit = mdl.fit(x=x_train, y=y_train, epochs=75,
-                          batch_size=10, verbose=0, validation_split=0.2)
+                          batch_size=10, verbose=1)
 
             # Return the loss value & metrics values
             loss, mse = mdl.evaluate(x_test, y_test, verbose=0)
