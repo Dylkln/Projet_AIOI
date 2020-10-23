@@ -101,7 +101,7 @@ def model_resnet_40(input_shape, learning_rate):
     """
     Modèle avec 40 block resnet.
     """
-    return model_resnet(input_shape, learning_rate, 40)
+    return model_resnet(input_shape, learning_rate, 10)
 
 
 def model_compact_data(input_shape, learning_rate):
@@ -259,26 +259,26 @@ def define_models(x_train, y_train):
 
     # Learning rate à appliquer à chaque modèle
     learning_rates = [1E-0, 1E-1, 1E-2, 1E-3, 1E-4,
-                      1E-5, 1E-6, 1E-7, 1E-8, 1E-9]
+                      1E-5, 1E-6, 1E-7]
 
     # Liste des modèles utilisés
-    list_model = [model_simple, model_resnet_10, model_resnet_40,
-                  model_compact_data, model_scatter_data, model_inception,
-                  model_resnext]
+    list_model = [model_simple, model_resnet_10, model_compact_data,
+                  model_scatter_data, model_inception, model_resnext]
 
     fit_out = {}
 
     for model in list_model:
         fit_out[model.__name__] = []
         print("\n#####\n{}\n#####".format(model.__name__))
-        time.sleep(60)
+        time.sleep(30)
         for lr in learning_rates:
             check(learning_rates.index(lr))
-            time.sleep(5)
+            time.sleep(3)
             mdl = model(input_shape, lr)
-            fit = mdl.fit(x=x_train, y=y_train, epochs=45, batch_size=10,
+            fit = mdl.fit(x=x_train, y=y_train, epochs=75, batch_size=10,
                           verbose=1, validation_split=0.2)
             fit_out[model.__name__].append(fit)
+            tf.keras.backend.clear_session()
 
     return fit_out
 

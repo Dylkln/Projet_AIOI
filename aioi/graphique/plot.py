@@ -20,10 +20,10 @@ def summarize_learning_rate(fit_out):
             loss.append(fit.history['loss'])
 
         label = ['1E-0', '1E-1', '1E-2', '1E-3', '1E-4',
-                 '1E-5', '1E-6', '1E-7', '1E-8', '1E-9']
+                 '1E-5', '1E-6', '1E-7']
         title = ['Val loss', 'Loss']
         color = ['black', '#839192', '#BA4A00', '#F1C40F', '#1E8449',
-                 '#3498DB', '#1A5276', '#8E44AD', '#E74C3C', '#8b1538']
+                 '#3498DB', '#1A5276', '#8b1538']
 
         fig, axs = plt.subplots(2, 1, figsize=(14,12), constrained_layout=True)
 
