@@ -36,3 +36,19 @@ def save_scores(scores):
                         np.mean(loss), np.std(loss), np.mean(mse), np.std(mse))
             )
 
+
+def save_keras_models(keras_models):
+    """
+    Save des modèles keras compilés.
+    """
+    for type_model, model in keras_models.items():
+        file_ = f"./Models/Keras_models/{type_model}.h5"
+        model.save(file_)
+
+
+def save_history(history):
+    """
+    Save de fit_out.history de chaque modèle - loss, val_loss & mse, val_mse
+    """
+    file_ = "./Models/models_history.npy"
+    np.save(file_, history)
