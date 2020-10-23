@@ -12,8 +12,9 @@ Usage
   $ python -m aioi
 """
 
+import argparse
 import warnings
-warnings.filterwarnings('ignore',category=FutureWarning)  # remove tensorflow warnings
+warnings.filterwarnings('ignore',category=FutureWarning) # remove tensorflow warnings
 import os
 import sys
 
@@ -24,10 +25,28 @@ from aioi.graphique import plot
 from aioi.models import models as mdl
 
 
+def arguments():
+    """
+    Détermine les arguments 
+    """
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('-a', '--analyse', dest='analyse', required=True,
+                        choices=['o', 'v', 'a', 'p'],
+                        help="""Analyse a faire: o pour optimisation des réseaux
+                        v pour la cross-fold validation
+                        a pour l'apprentissage
+                        p pour la prédiction""")
+
+    return parser.parse_args()
+
+
 def main():
     """
     Main program function.
     """
+    args = arguments()
+
     arn = rf.read_json('Data/train.json'), rf.read_json('Data/test.json')
 
     ###
@@ -52,13 +71,23 @@ def main():
         y_train = rf.read_npy("./Data/y_train.npy")
         print("Y_train shape: {}".format(y_train.shape), end="\n\n")
 
-    ###
-    # Optimisation des modèles
-    ###
-    fit_out = mdl.define_models(x_train, y_train)
+    if args.analyse == "o":
+        print("###########")
+        print("# Optimisation des réseaux de neurones!")
+        print("###########", end="\n\n")
 
-    plot.summarize_learning_rate(fit_out)
-    plot.summarize_neural_network(fit_out)
+        fit_out = mdl.define_models(x_train, y_train)
+
+        plot.summarize_learning_rate(fit_out)
+        plot.summarize_neural_network(fit_out)
+
+    elif args.analyse == "v":
+        print("###########")
+        print("# Cross-fold validation")
+        print("###########", end="\n\n")
+        scores = mdl.repeated_kfold_validation(x_train, y_train)
+
+        sf.save_scores(scores)
 
 
     # Rajouter prédict: https://machinelearningmastery.com/how-to-make-classification-and-regression-predictions-for-deep-learning-models-in-keras/
