@@ -11,13 +11,18 @@ import time
 from keras import models
 from keras import layers
 from keras import optimizers
+from sklearn import model_selection
+from keras.wrappers.scikit_learn import KerasClassifier
 import tensorflow as tf
 
 
 def resize_shape_data(model):
-    model = layers.Conv1D(filters=5, kernel_size=(20,), activation="relu")(model)
-    model = layers.Conv1D(filters=5, kernel_size=(20,), activation="relu")(model)
-    model = layers.Conv1D(filters=5, kernel_size=(2,), activation="relu")(model)
+    model = layers.Conv1D(
+        filters=5, kernel_size=(20,), activation="relu")(model)
+    model = layers.Conv1D(
+        filters=5, kernel_size=(20,), activation="relu")(model)
+    model = layers.Conv1D(
+        filters=5, kernel_size=(2,), activation="relu")(model)
 
     return model
 
@@ -93,13 +98,6 @@ def model_resnet(input_shape, learning_rate, nb_resnet):
 def model_resnet_10(input_shape, learning_rate):
     """
     Modèle avec 10 block resnet.
-    """
-    return model_resnet(input_shape, learning_rate, 10)
-
-
-def model_resnet_40(input_shape, learning_rate):
-    """
-    Modèle avec 40 block resnet.
     """
     return model_resnet(input_shape, learning_rate, 10)
 
@@ -254,6 +252,11 @@ def model_resnext(input_shape, learning_rate):
 
 
 def define_models(x_train, y_train):
+    """
+    Réalise l'apprentissage de chaque modèle pour un learning rate donné.
+
+    Cela permet de réaliser une optimisation des différents réseaux de neurones.
+    """
     # Shape des data en entrée
     input_shape = (107,14)
 
@@ -283,8 +286,53 @@ def define_models(x_train, y_train):
     return fit_out
 
 
+def repeated_kfold_validation(X, Y):
+    """
+    Réalise une k-fold Cross-validation pour évaluer les différents modèles.
+
+    Une étape d'optimisation des modèles a été réalisée au préalable.
+    """
+    # Shape des data en entrée
+    input_shape = (107,14)
+
+    # Liste des modèles utilisés
+    list_model = [model_simple, model_resnet_10, model_compact_data,
+                  model_scatter_data, model_inception, model_resnext]
+
+    # Learing rate optimisé pour chaque modèle
+    learning_rate = [1E-2, 1E-6, 1E-1, 1E-2, 1E-2, 1E-2]
+
+    scores = {}
+
+    for index, model in enumerate(list_model):
+        print("\n#####\n{}\n#####".format(model.__name__))
+        #time.sleep(30)
+
+        scores[model.__name__] = {'Loss': [], 'Mse': []}
+        # kfold = model_selection.StratifiedKFold(n_splits=10)
+
+        for i in range(10):
+            print("Kfold {}".format(i+1))
+            time.sleep(2)
+            x_train, x_test, y_train, y_test = \
+                model_selection.train_test_split(X, Y, test_size=0.3,
+                                                 random_state=2)
+
+            mdl = model(input_shape, learning_rate[index])
+            fit = mdl.fit(x=x_train, y=y_train, epochs=75,
+                          batch_size=10, verbose=0, validation_split=0.2)
+
+            # Return the loss value & metrics values
+            loss, mse = mdl.evaluate(x_test, y_test, verbose=0)
+
+            scores[model.__name__]['Loss'].append(loss)
+            scores[model.__name__]['Mse'].append(mse)
+
+    return scores
+
+
 def check(index):
-    print("{} / 10".format(index+1))
+    print("{} / 8".format(index+1))
 
 
 if __name__ == "__main__":

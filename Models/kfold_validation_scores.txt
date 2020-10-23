@@ -1,0 +1,1 @@
+Model_simple - Loss: mean=0.286, std=0.040 | Mse: mean=0.286, sd=0.040
