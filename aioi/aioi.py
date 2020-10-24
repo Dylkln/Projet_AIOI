@@ -27,16 +27,17 @@ from aioi.models import models as mdl
 
 def arguments():
     """
-    Détermine les arguments 
+    Détermine les arguments.
     """
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-a', '--analyse', dest='analyse', required=True,
-                        choices=['o', 'v', 'a', 'p'],
-                        help="""Analyse a faire: o pour optimisation des réseaux
-                        v pour la cross-fold validation
-                        a pour l'apprentissage
-                        p pour la prédiction""")
+                        choices=['opt', 'val', 'app', 'eval', 'pred'],
+                        help="""Analyse a faire: opt pour optimisation des réseaux
+                        val pour la cross-fold validation
+                        app pour l'apprentissage
+                        eval pour évaluer les performances des modèles
+                        pred pour la prédiction""")
 
     return parser.parse_args()
 
@@ -53,8 +54,8 @@ def main():
     # Préparation des données x_input du réseau de neurones
     ###
     if not os.path.exists("./Data/x_train.npy"):
-        x_input = ['sequence', 'structure', 'predicted_loop_type', 'SN_filter']
-        x_train = data.x_input(arn[0].query('SN_filter == 1')[x_input])
+        arn_train = data.formatage_x(arn[0].query('SN_filter == 1'))
+        x_train = data.x_input(arn_train)
         sf.save_neural_network_data("x_train", x_train)
     else:
         x_train = rf.read_npy("./Data/x_train.npy")
@@ -71,7 +72,7 @@ def main():
         y_train = rf.read_npy("./Data/y_train.npy")
         print("Y_train shape: {}".format(y_train.shape), end="\n\n")
 
-    if args.analyse == "o":
+    if args.analyse == "opt":
         print("###########")
         print("# Optimisation des réseaux de neurones!")
         print("###########", end="\n\n")
@@ -81,15 +82,20 @@ def main():
         plot.summarize_learning_rate(fit_out)
         plot.summarize_neural_network(fit_out)
 
-    elif args.analyse == "v":
+        print("\nOVER\n")
+
+    #elif args.analyse == "val":
         print("###########")
         print("# Cross-fold validation")
         print("###########", end="\n\n")
+        sys.exit()
         scores = mdl.repeated_kfold_validation(x_train, y_train)
 
         sf.save_scores(scores)
 
-    elif args.analyse == "a":
+        print("\nOVER\n")
+
+    #elif args.analyse == "app":
         print("###########")
         print("# Apprentissage des modèles")
         print("###########", end="\n\n")
@@ -99,8 +105,21 @@ def main():
         sf.save_history(history)
         sf.save_keras_models(keras_models)
 
+        print("\nOVER\n")
 
-    # Rajouter prédict: https://machinelearningmastery.com/how-to-make-classification-and-regression-predictions-for-deep-learning-models-in-keras/
+    elif args.analyse == "eval":
+        print("###########")
+        print("# Evaluation des performances du modèles")
+        print("###########", end="\n\n")
+
+        history = rf.load_history()
+        #keras_models = rf.load_keras_models()
+
+        plot.summarize_models(history)
+
+        arn_test, x_new = data.new_x(arn[1])
+
+        print("\nOVER\n")
 
 
 if __name__ == "__main__":

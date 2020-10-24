@@ -11,7 +11,7 @@ def summarize_learning_rate(fit_out):
     """
     Permet d'afficher la val_loss & la loss de chaque modèle.
 
-    Et ceux pour chaque learning rate.
+    Et ceux pour les différents decay rates de la learning rate utilisés.
     """
     for models, values in fit_out.items():
         val_loss, loss = [], []
@@ -19,8 +19,7 @@ def summarize_learning_rate(fit_out):
             val_loss.append(fit.history['val_loss'])
             loss.append(fit.history['loss'])
 
-        label = ['1E-0', '1E-1', '1E-2', '1E-3', '1E-4',
-                 '1E-5', '1E-6', '1E-7']
+        label = ['1E-1', '1E-2', '1E-3', '1E-4', '1E-5', '1E-6', '1E-7', '1E-8']
         title = ['Val loss', 'Loss']
         color = ['black', '#839192', '#BA4A00', '#F1C40F', '#1E8449',
                  '#3498DB', '#1A5276', '#8b1538']
@@ -38,7 +37,8 @@ def summarize_learning_rate(fit_out):
         axs[1].legend(loc=1, bbox_to_anchor=(0.,-0.052, 1., -0.052), ncol=10,
                       borderaxespad=0., mode='expand', fontsize='large')
 
-        fig.suptitle(models, fontsize="xx-large")
+        title = f"Decay rates - {models}"
+        fig.suptitle(title, fontsize="xx-large")
 
         name = f"./Models/Optimisation/optimisation-{models}.png"
         plt.savefig(name)
@@ -55,36 +55,33 @@ def summarize_neural_network(fit_out):
                    show_shapes=True, show_layer_names=True)
 
 
-def summarize_model_old(history, suptitle):
-    """
-    Permet de faire les deux graphes.
+def summarize_models(history):
+    print("Plot - model loss & model mse", end="\n\n")
+    for mdl in history:
+        label = [('loss', 'val_loss'), ('mse', 'val_mse')]
+        title = ['Model loss', 'Model mse']
 
-    Parameter
-    ---------
-    history
-        ce qui est retourné par le fit d'un modèle
-    suptitle: str
-        le titre du graphe
-    """
-    label = [('loss', 'val_loss'), ('accuracy', 'val_accuracy')]
-    title = ['Cross entropy loss', 'Classification accuracy']
+        fig, axs = plt.subplots(2, 1, figsize=(12,10), constrained_layout=True)
 
-    fig, axs = plt.subplots(2, 1, figsize=(9,6), constrained_layout=True)
+        for i in range(2):
+            axs[i].plot(history[mdl][label[i][0]], color="#8b1538",
+                        label=label[i][0])
+            axs[i].plot(history[mdl][label[i][1]], color="#1F618D",
+                        label=label[i][1])
 
-    for i in range(2):
-        axs[i].plot(history[label[i][0]], color='blue', label=label[i][0])
-        axs[i].plot(history[label[i][1]], color='orange', label=label[i][1])
-        axs[i].set_title(title[i], fontsize="medium")
+            axs[i].set_title(title[i], fontsize="x-large")
 
-        # Ajouter la légende au dessus du plot sans changer sa taille
-        axs[i].legend(loc=3, bbox_to_anchor=(0., 1.02, 1., .102), ncol=2, 
-                      borderaxespad=0., mode='expand', fontsize='medium')
+            axs[i].set_xlabel('Epoch', fontsize="medium")
+            axs[i].set_ylabel(label[i][0], fontsize="medium")
 
-    title = "./Fig/" + suptitle
-    fig.suptitle(title, fontsize="x-large")
+            # Ajouter la légende au dessus du plot sans changer sa taille
+            axs[i].legend(loc=1, ncol=1, fontsize="x-large")
 
-    plt.show()
-    plt.clf()
+        fig.suptitle(mdl, fontsize="xx-large")
+
+        name = f"./Models/Summarize_models/{mdl}.png"
+        plt.savefig(name)
+        plt.clf()
 
 
 if __name__ == "__main__":
