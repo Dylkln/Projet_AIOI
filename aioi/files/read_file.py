@@ -14,6 +14,8 @@ import pandas as pd
 import numpy as np
 import sys
 
+from keras import models
+
 
 def valide_file(fichier):
     """Vérifie que le fichier lu est valide.
@@ -79,15 +81,28 @@ def read_npy(fichier):
 
 def load_keras_models():
     """
-    Faire pour chaque fichier .h5 le load et l'ajouter dans un dictionnaire de type:
-    {Type_model: model}
+    Load les modèles stockés dans des fichier .h5.
+
+    Return
+    ------
+    keras_models: dictionary
+      -key: modèle type
+      -value: keras model
     """
-    pass
+    path = "./Models/Keras_models/"
+    keras_models = {}
+
+    for mdl in os.listdir(path):
+        file_ = path + mdl
+        name_ = mdl.split('.')[0]
+        keras_models[name_] = models.load_model(file_)
+
+    return keras_models
 
 
 def load_history():
     file_ = "./Models/models_history.npy"
-    return np.load(file_, allow_pickle=True).items
+    return np.load(file_, allow_pickle=True).item()
 
 
 if __name__ == "__main__":

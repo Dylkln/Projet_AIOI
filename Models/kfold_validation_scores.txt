@@ -1,6 +1,6 @@
-Model_simple - Loss: mean=0.176, std=0.041 | Mse: mean=0.176, sd=0.041
-Model_resnet_10 - Loss: mean=0.372, std=0.024 | Mse: mean=0.372, sd=0.024
-Model_compact_data - Loss: mean=0.117, std=0.018 | Mse: mean=0.117, sd=0.018
-Model_scatter_data - Loss: mean=0.216, std=0.065 | Mse: mean=0.216, sd=0.065
-Model_inception - Loss: mean=0.207, std=0.038 | Mse: mean=0.207, sd=0.038
-Model_resnext - Loss: mean=0.134, std=0.021 | Mse: mean=0.134, sd=0.021
+Model_simple - Loss: mean=0.290, std=0.000 | Mse: mean=0.290, sd=0.000
+Model_resnet_15 - Loss: mean=0.296, std=0.000 | Mse: mean=0.296, sd=0.000
+Model_compact_data - Loss: mean=0.342, std=0.000 | Mse: mean=0.342, sd=0.000
+Model_scatter_data - Loss: mean=0.290, std=0.000 | Mse: mean=0.290, sd=0.000
+Model_inception - Loss: mean=0.255, std=0.000 | Mse: mean=0.255, sd=0.000
+Model_resnext - Loss: mean=0.261, std=0.000 | Mse: mean=0.261, sd=0.000

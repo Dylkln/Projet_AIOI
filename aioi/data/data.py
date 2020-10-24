@@ -2,9 +2,43 @@
 Ce module permet de préparer les données pour le réseau de neurones.
 """
 
+import pandas as pd
 import numpy as np
 import sys
 from keras.utils import to_categorical
+
+
+def formatage_x(arn):
+    """
+    Formatage des X input, i.e découpage des séquences de taille 107 & 130 en
+    séquence de taille 68.
+
+    68 correspond à la taille minimum des séquences scored et a donc été choisi.
+    """
+    col_names = ['id', 'sequence', 'structure', 'predicted_loop_type', 'seq_length']
+    X_new = {'index': [], 'id': [], 'sequence': [], 'structure': [],
+             'predicted_loop_type': []}
+
+    for index, row  in arn[col_names].iterrows():
+        # Séquence de taille 107 - séparer la séquence [:68] & [107-68:]
+        # Séquence de taille 130 - séparer la séquence [:107] & [130-107:]
+
+        X_new['index'].append(index)
+        for key in col_names[:-1]:
+            X_new[key].append(row[key][:68])
+
+        if row['seq_length'] == 107:
+            X_new['index'].append(index)
+            for key in col_names[:-1]:
+                X_new[key].append(row[key][107-68:])
+
+        else:
+            X_new['index'].append(index)
+            for key in col_names[:-1]:
+                X_new[key].append(row[key][130-68:])
+
+    return pd.DataFrame.from_dict(X_new)
+
 
 def x_sequence(data):
     """
@@ -118,9 +152,6 @@ def x_input(arn_train):
     """
     print("Préparation des x_train")
 
-    if not arn_train.shape[1] == arn.shape[1]:
-        sys.exit("Error: lors de la sélection des data qui ont un un SN_filter de 1")
-
     x_seq = x_sequence(arn_train['sequence'])
     x_struc = x_structure(arn_train['structure'])
     x_loops = x_predicted_loops(arn_train['predicted_loop_type'])
@@ -163,12 +194,49 @@ def y_output(arn_train):
                 deg_mg_c[i][j], deg_c[i][j]
             ])
         y_train.append(tmp)
+        y_train.append(tmp)
+
+        # Les 1589 séquences du x_train sont découpées en séquences de taille 68,
+        # soit - part1 [0:68]
+        #      - part2 [107-68:]
+        # x_train size devient donc 1589*2 = 3178
+        # c'est pourquoi dédoublement dans y_train des valeurs prédites
+        # ainsi y_train size = 3178
+        # on utilise ce qu'on connaît (les 68 1er) pour prédire l'inconnu
 
     y_train = np.array(y_train)
 
     print("Y_train shape: {}".format(y_train.shape), end="\n\n")
 
     return y_train
+
+
+def new_x(arn):
+    """
+    Formatage du data frame arn_test au bon format.
+
+    Return
+    ------
+    arn_test: pandas data frame
+        les données de test au format df
+    x_new: numpy array
+        les données de test au bon format sur lesquel les prédiction vont être faites
+    """
+    arn_test = formatage_x(arn)
+
+    xnew_seq = x_sequence(arn_test['sequence'])
+    xnew_struc = x_structure(arn_test['structure'])
+    xnew_loops = x_predicted_loops(arn_test['predicted_loop_type'])
+
+    x_new = x_concatenation(xnew_seq, xnew_struc, xnew_loops)
+
+    print("Data frame arn_test shape: {}".format(arn_test.shape))
+    print("Sequences shape: {} - 4 classes".format(xnew_seq.shape))
+    print("Structures shape: {} - 3 classes".format(xnew_struc.shape))
+    print("Loops shape: {} - 7 classes".format(xnew_loops.shape))
+    print("x_new shape: {}".format(x_new.shape), end="\n\n")
+
+    return arn_test, x_new
 
 
 if __name__ == "__main__":
