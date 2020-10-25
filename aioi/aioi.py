@@ -111,12 +111,23 @@ def main():
         print("# Evaluation des performances du modèles")
         print("###########", end="\n\n")
 
+        # Analyse performance des modèles en apprentissage & test
         history = rf.load_history()
-        #keras_models = rf.load_keras_models()
-
         plot.summarize_models(history)
 
-        arn_test, x_new = data.new_x(arn[1])
+    elif args.analyse == "pred":
+        print("###########")
+        print("# Prédiction")
+        print("###########", end="\n\n")
+
+        keras_models = rf.load_keras_models()
+        arn_test, x_test = data.new_x(arn[1])
+
+        predict = mdl.prediction(x_test, keras_models)
+
+        for model in predict:
+            output = data.traiter_predict_output(arn_test, predict[model])
+            sf.write_submission(output, model)
 
         print("\nOVER\n")
 
