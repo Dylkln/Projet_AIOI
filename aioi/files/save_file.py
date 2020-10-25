@@ -2,6 +2,7 @@
 Permet de sauvegarder les données.
 """
 
+import csv
 import numpy as np
 import sys
 
