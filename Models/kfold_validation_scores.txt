@@ -1,0 +1,7 @@
+Loss & mse obtenues après une étape de repeated kfold - 10
+Model_simple - Loss: mean=0.196, std=0.040 | Mse: mean=0.196, sd=0.040
+Model_resnet_10 - Loss: mean=0.218, std=0.050 | Mse: mean=0.218, sd=0.050
+Model_compact_data - Loss: mean=0.161, std=0.013 | Mse: mean=0.161, sd=0.013
+Model_scatter_data - Loss: mean=0.169, std=0.029 | Mse: mean=0.169, sd=0.029
+Model_inception - Loss: mean=0.158, std=0.017 | Mse: mean=0.158, sd=0.017
+Model_resnext - Loss: mean=0.181, std=0.015 | Mse: mean=0.181, sd=0.015
