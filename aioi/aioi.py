@@ -127,7 +127,7 @@ def main():
 
         for model in predict:
             output = data.traiter_predict_output(arn_test, predict[model])
-            sf.write_submission(output, model)
+            sf.save_submission(output, model)
 
         print("\nOVER\n")
 
