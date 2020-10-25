@@ -1,5 +1,6 @@
 # Modules
 from aioi.files.read_file import read_json
+from statistics import mean
 import pandas as pd
 
 
@@ -99,13 +100,112 @@ def count_loop_type(data_train):
 	return loop_index_dict
 
 
+def save_loop(data_train_deg):
+
+	len_deg = len(data_train_deg["deg_50C"][0])
+
+	predicted_loops = [loop[:len_deg] for loop in data_train_deg["predicted_loop_type"]]
+
+	sequences = [seq[:len_deg] for seq in data_train_deg["sequence"]]
+
+	reactivities = [react[:len_deg] for react in data_train_deg["reactivity"]]
+	reactivities_err = [react_err[:len_deg] for react_err in data_train_deg["reactivity_error"]]
+
+	degradations_pH10 = [deg for deg in data_train_deg["deg_pH10"]]
+	degradations_50C = [deg for deg in data_train_deg["deg_50C"]]
+	
+	deg_error_pH10 = [deg_error for deg_error in data_train_deg["deg_error_pH10"]]
+	deg_error_50C = [deg_error for deg_error in data_train_deg["deg_error_50C"]]
+
+	loops_seq = {}
+	loops_deg_pH10 = {}
+	loops_deg_50C = {}
+	loops_reac = {}
+	loops_reac_error = {}
+	loops_deg_error_pH10 = {}
+	loops_deg_error_50C = {}
+
+	for i, loop in enumerate(predicted_loops):
+		for j, ltype in enumerate(loop):
+			
+			if ltype not in loops_seq.keys():
+				
+				loops_seq[ltype] = []
+				loops_deg_50C[ltype] = []
+				loops_deg_pH10[ltype] = []
+				loops_reac[ltype] = []
+				loops_reac_error[ltype] = []
+				loops_deg_error_50C[ltype] = []
+				loops_deg_error_pH10[ltype] = []
+			
+			loops_seq[ltype].append(sequences[i][j])
+			loops_deg_50C[ltype].append(degradations_50C[i][j])
+			loops_deg_pH10[ltype].append(degradations_pH10[i][j])
+			loops_reac[ltype].append(reactivities[i][j])
+			loops_reac_error[ltype].append(reactivities_err[i][j])
+			loops_deg_error_50C[ltype].append(deg_error_50C[i][j])
+			loops_deg_error_pH10[ltype].append(deg_error_pH10[i][j])
+
+
+	return loops_seq, loops_reac, loops_reac_error, loops_deg_pH10, \
+	loops_deg_50C, loops_deg_error_pH10, loops_deg_error_50C
+
+
+def count_dict_loop_seq(loops_seq):
+
+	count_loop_seq = {}
+
+	for cle, valeur in loops_seq.items():
+		if cle not in count_loop_seq.keys():
+			count_loop_seq[cle] = {}
+			for val in valeur:
+				if val not in count_loop_seq[cle].keys():
+					count_loop_seq[cle][val] = 0
+				count_loop_seq[cle][val] += 1
+
+	return count_loop_seq
+
+
+def calc_mean(dict1, dict2):
+	
+	mean_dict1 = {}
+	mean_dict2 = {}
+
+	for cle in dict1.keys():
+		if cle not in mean_dict1.keys():
+			mean_dict1[cle] = round(mean(dict1[cle]), 4)
+
+	for cle in dict2.keys():
+		if cle not in mean_dict2.keys():
+			mean_dict2[cle] = round(mean(dict2[cle]), 4)
+
+
+	return mean_dict1, mean_dict2
+
+
 def main():
 	
 	data_train = read_json('./Data/train.json')
+	data_train = data_train.query("SN_filter == 1")
+	
+	data_train_deg = data_train[["sequence", "predicted_loop_type",
+	"reactivity_error", "reactivity", "deg_error_pH10", "deg_error_50C",
+	"deg_pH10", "deg_50C"]]
+
 	data_train = data_train[["index", "id", "sequence", 
 		"structure", "predicted_loop_type"]]
 
 	nt_index_dict = count_nt(data_train)
+
+	loops_seq, loops_reac, loops_reac_error, \
+	loops_deg_pH10, loops_deg_50C, loops_deg_error_pH10, \
+	loops_deg_error_50C = save_loop(data_train_deg)
+
+	count_loop_seq = count_dict_loop_seq(loops_seq)
+	mean_reac, mean_reac_error = calc_mean(loops_reac, loops_reac_error)
+	mean_deg_50C, mean_deg_error_50C = calc_mean(loops_deg_50C, loops_deg_error_50C)
+	mean_deg_pH10, mean_deg_error_pH10 = calc_mean(loops_deg_pH10, loops_deg_error_pH10)
+
 
 #	loop type :
 
@@ -117,13 +217,36 @@ def main():
 #	X = tetraboucles
 #	M = Multiloop
 
+
 	struct_index_dict = count_structure(data_train)
 	loop_index_dict = count_loop_type(data_train)
 
-	nt_df = pd.concat({k : pd.DataFrame.from_dict(v, "index") for k,v in nt_index_dict.items()}, axis = 1)
-	struct_df = pd.concat({k : pd.DataFrame.from_dict(v, "index") for k,v in struct_index_dict.items()}, axis = 1)
-	loop_df = pd.concat({k : pd.DataFrame.from_dict(v, "index") for k,v in loop_index_dict.items()}, axis = 1)
+	nt_df = pd.DataFrame(nt_index_dict)
+	struct_df = pd.DataFrame(struct_index_dict)
+	loop_df = pd.DataFrame(loop_index_dict)
+	
+	count_df = pd.DataFrame(count_loop_seq)
+	
+	row4 = pd.Series(data = mean_reac, name = "mean reactivity")
+	count_df = count_df.append(row4)
 
+	row5 = pd.Series(data = mean_reac_error, name = "mean reactivity error")
+	count_df = count_df.append(row5)
+
+	row6 = pd.Series(data = mean_deg_50C, name = "mean deg 50C")
+	count_df = count_df.append(row6)
+
+	row7 = pd.Series(data = mean_deg_error_50C, name = "mean deg error 50C")
+	count_df = count_df.append(row7)
+
+	row8 = pd.Series(data = mean_deg_pH10, name = "mean deg pH10")
+	count_df = count_df.append(row8)
+
+	row9 = pd.Series(data = mean_deg_error_pH10, name = "mean deg error pH10")
+	count_df = count_df.append(row9)
+
+
+	count_df.to_csv("count.csv", index = True, header = True)
 	nt_df.to_csv("nt_count.csv", index = True, header = True)
 	struct_df.to_csv("struct_count.csv", index = True, header = True)
 	loop_df.to_csv("loop_count.csv", index = True, header = True)
