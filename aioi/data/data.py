@@ -239,5 +239,77 @@ def new_x(arn):
     return arn_test, x_new
 
 
+def traiter_predict_output(arn, predict):
+    """
+    Chaque arn a été découpé en deux segements de taille 68.
+
+    La prédiction a été ainsi réalisée:
+
+      > ARN de taille 107
+
+        - De la position 1 à 68
+        - De la position 29 (107-68) à 107
+
+      > ARN de taille 130
+
+      - De la postion 1 à 68
+      - De la position 62 (130-68) à 130
+
+    Il est donc nécessaire de combiner les valeurs obtenues pour obtenir la
+    prédiction sur l'ensemble de la séquence.
+    """
+    output = {}
+
+    for i in range(0, len(predict), 2):
+        seq_length = arn['seq_length'][i]
+        id_seq = arn['id'][i]
+
+        output[id_seq] = {
+            'reactivity': [], 'deg_Mg_pH10': [], 'deg_pH10': [], 'deg_Mg_50C': [],
+            'deg_50C': []
+        }
+
+        if seq_length == 107:
+
+            # Ajout des 39 premiers éléments du segment 1
+            for index, key in enumerate(output[id_seq].keys()):
+                for ele in predict[i][:,index][:39]:
+                    output[id_seq][key].append(ele)
+
+            # Ajout des 29 éléments en commun entre segment 1 & 2
+            # Ici une moyenne des valeurs observées à une position donnée est faite
+            for index, key in enumerate(output[id_seq].keys()):
+                sum_ = np.add(predict[i][:,index][39:], predict[i+1][:,index][:29])
+                mean_ = np.divide(sum_, 2)
+                for ele in mean_:
+                    output[id_seq][key].append(ele)
+
+            # Ajout des 39 derniers éléments du segment 2
+            for index, key in enumerate(output[id_seq].keys()):
+                for ele in predict[i+1][:,index][29:]:
+                    output[id_seq][key].append(ele)
+
+        else:
+            # Ajout des 62 premiers éléments du segment 1
+            for index, key in enumerate(output[id_seq].keys()):
+                for ele in predict[i][:,index][:62]:
+                    output[id_seq][key].append(ele)
+
+            # Ajout des 6 éléments en commun entre segment 1 & 2
+            # Ici une moyenne des valeurs observées à une position donnée est faite
+            for index, key in enumerate(output[id_seq].keys()):
+                sum_ = np.add(predict[i][:,index][62:], predict[i+1][:,index][:6])
+                mean_ = np.divide(sum_, 2)
+                for ele in mean_:
+                    output[id_seq][key].append(ele)
+
+            # Ajout des 62 derniers éléments du segment 2
+            for index, key in enumerate(output[id_seq].keys()):
+                for ele in predict[i+1][:,index][6:]:
+                    output[id_seq][key].append(ele)
+
+    return output
+
+
 if __name__ == "__main__":
     sys.exit()  # Aucune action souhaitée

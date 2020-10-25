@@ -295,7 +295,7 @@ def repeated_kfold_validation(X, Y):
 
     # Learing rate optimisé pour chaque modèle
     decay_rates = [1E-4, 1E-8, 1E-6, 1E-4, 1E-4, 1E-3]
-    
+
     scores = {}
 
     for index, model in enumerate(list_model):
@@ -342,7 +342,7 @@ def apprentissage(x_train, y_train):
 
     # Learing rate optimisé pour chaque modèle
     decay_rates = [1E-4, 1E-8, 1E-6, 1E-4, 1E-4, 1E-3]
-    
+
     history, models = {}, {}
 
     for index, model in enumerate(list_model):
@@ -357,6 +357,16 @@ def apprentissage(x_train, y_train):
         models[model.__name__] = mdl
 
     return history, models
+
+
+def prediction(x_test, keras_models):
+    """
+    Méthode pour réaliser une prédiction à partir d'un jeu de données de test.
+    """
+    y_test = {}
+    for mdl in keras_models:
+        y_test[mdl] = keras_models[mdl].predict(x_test)
+    return y_test
 
 
 if __name__ == "__main__":

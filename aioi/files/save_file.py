@@ -3,6 +3,8 @@ Permet de sauvegarder les données.
 """
 
 import numpy as np
+import sys
+
 
 def save_neural_network_data(name, data):
     """
@@ -53,3 +55,30 @@ def save_history(history):
     """
     file_ = "./Models/models_history.npy"
     np.save(file_, history)
+
+
+def save_submission(output, model):
+    file_ = f"Models/Submission/submission-{model}.csv"
+    with open(file_, 'w') as filout:
+        fields = [
+            'id_seqpos', 'reactivity', 'deg_Mg_pH10', 'deg_pH10', 'deg_Mg_50C',
+            'deg_50C'
+        ]
+        f_writer = csv.DictWriter(filout, fieldnames=fields)
+        f_writer.writeheader()
+
+        for id_seq in output:
+            for i in range(len(output[id_seq]['reactivity'])):
+                data = {
+                    'id_seqpos': f"{id_seq}_{i}",
+                    'reactivity': output[id_seq]['reactivity'][i],
+                    'deg_Mg_pH10': output[id_seq]['deg_Mg_pH10'][i],
+                    'deg_pH10': output[id_seq]['deg_pH10'][i],
+                    'deg_Mg_50C': output[id_seq]['deg_Mg_50C'][i],
+                    'deg_50C': output[id_seq]['deg_50C'][i]
+                }
+                f_writer.writerow(data)
+
+
+if __name__ == "__main__":
+    sys.exit()  # Aucune action souhaitée
