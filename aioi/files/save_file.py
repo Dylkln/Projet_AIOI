@@ -23,10 +23,11 @@ def save_scores(scores):
     """
     Permet de save la valeur moyenne & la standard deviation de la loss & du mse.
 
-    Ces valeurs sont obtenues à la suite de repeated kfold validation.
+    Ces valeurs sont obtenues à la suite d'une étape de repeated kfold validation.
     """
     file_ = "./Models/kfold_validation_scores.txt"
     with open(file_, "w") as filout:
+        filout.write("Loss & mse obtenues après une étape de repeated kfold - 10\n")
         for model in scores:
             loss, mse = scores[model]['Loss'], scores[model]['Mse']
 

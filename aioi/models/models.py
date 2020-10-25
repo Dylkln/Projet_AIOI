@@ -16,17 +16,6 @@ from keras.wrappers.scikit_learn import KerasClassifier
 import tensorflow as tf
 
 
-def resize_shape_data(model):
-    model = layers.Conv1D(
-        filters=5, kernel_size=(20,), activation="relu")(model)
-    model = layers.Conv1D(
-        filters=5, kernel_size=(20,), activation="relu")(model)
-    model = layers.Conv1D(
-        filters=5, kernel_size=(2,), activation="relu")(model)
-
-    return model
-
-
 def model_simple(input_shape, decay):
     """
     Définition d'un 1er modèle simple.
@@ -97,11 +86,11 @@ def model_resnet(input_shape, decay, nb_resnet):
     return model
 
 
-def model_resnet_15(input_shape, decay):
+def model_resnet_10(input_shape, decay):
     """
-    Modèle avec 15 block resnet.
+    Modèle avec 10 block resnet.
     """
-    return model_resnet(input_shape, decay, 15)
+    return model_resnet(input_shape, decay, 10)
 
 
 def model_compact_data(input_shape, decay):
@@ -270,9 +259,9 @@ def define_models(x_train, y_train):
     decay_rates = [1E-1, 1E-2, 1E-3, 1E-4, 1E-5, 1E-6, 1E-7, 1E-8]
 
     # Liste des modèles utilisés
-    list_model = [model_simple, model_resnet_15, model_compact_data,
+    list_model = [model_simple, model_resnet_10, model_compact_data,
                   model_scatter_data, model_inception, model_resnext]
-
+    
     fit_out = {}
 
     for model in list_model:
@@ -301,12 +290,12 @@ def repeated_kfold_validation(X, Y):
     input_shape = (68,14)
 
     # Liste des modèles utilisés
-    list_model = [model_simple, model_resnet_15, model_compact_data,
+    list_model = [model_simple, model_resnet_10, model_compact_data,
                   model_scatter_data, model_inception, model_resnext]
 
     # Learing rate optimisé pour chaque modèle
-    decay_rates = [1E-2, 1E-6, 1E-1, 1E-2, 1E-2, 1E-2]
-
+    decay_rates = [1E-4, 1E-8, 1E-6, 1E-4, 1E-4, 1E-3]
+    
     scores = {}
 
     for index, model in enumerate(list_model):
@@ -317,7 +306,7 @@ def repeated_kfold_validation(X, Y):
         # kfold = model_selection.StratifiedKFold(n_splits=10)
 
         for i in range(10):
-            print("Kfold {}".format(i+1))
+            print("Kfold {} - {}".format(i+1, model.__name__))
             time.sleep(2)
             x_train, x_test, y_train, y_test = \
                 model_selection.train_test_split(X, Y, test_size=0.3,
@@ -348,17 +337,17 @@ def apprentissage(x_train, y_train):
     input_shape = (68, 14)
 
     # Liste des modèles utilisés
-    list_model = [model_simple, model_resnet_15, model_compact_data,
+    list_model = [model_simple, model_resnet_10, model_compact_data,
                   model_scatter_data, model_inception, model_resnext]
 
     # Learing rate optimisé pour chaque modèle
-    decay_rates = [1E-2, 1E-6, 1E-1, 1E-2, 1E-2, 1E-2]
-
+    decay_rates = [1E-4, 1E-8, 1E-6, 1E-4, 1E-4, 1E-3]
+    
     history, models = {}, {}
 
     for index, model in enumerate(list_model):
         print("\n#####\n{}\n#####".format(model.__name__))
-        #time.sleep(30)
+        time.sleep(30)
 
         mdl = model(input_shape, decay_rates[index])
         fit = mdl.fit(x=x_train, y=y_train, epochs=175, batch_size=10, verbose=1,
