@@ -17,23 +17,23 @@ def formatage_x(arn):
     """
     col_names = ['id', 'sequence', 'structure', 'predicted_loop_type', 'seq_length']
     X_new = {'index': [], 'id': [], 'sequence': [], 'structure': [],
-             'predicted_loop_type': []}
+             'predicted_loop_type': [], 'seq_length': []}
 
     for index, row  in arn[col_names].iterrows():
         # Séquence de taille 107 - séparer la séquence [:68] & [107-68:]
         # Séquence de taille 130 - séparer la séquence [:107] & [130-107:]
 
         X_new['index'].append(index)
+        X_new['seq_length'].append(row['seq_length'])
         for key in col_names[:-1]:
             X_new[key].append(row[key][:68])
 
+        X_new['index'].append(index)
+        X_new['seq_length'].append(row['seq_length'])
         if row['seq_length'] == 107:
-            X_new['index'].append(index)
             for key in col_names[:-1]:
                 X_new[key].append(row[key][107-68:])
-
         else:
-            X_new['index'].append(index)
             for key in col_names[:-1]:
                 X_new[key].append(row[key][130-68:])
 
@@ -213,7 +213,7 @@ def y_output(arn_train):
 
 def new_x(arn):
     """
-    Formatage du data frame arn_test au bon format.
+    Formatage du data frame arn_test & de x_test au bon format.
 
     Return
     ------
