@@ -9,7 +9,7 @@ Il permet:
 
 Usage
 -----
-  $ python -m aioi
+  $ python -m aioi -a ARG
 """
 
 import argparse
@@ -84,18 +84,17 @@ def main():
 
         print("\nOVER\n")
 
-    #elif args.analyse == "val":
+    elif args.analyse == "val":
         print("###########")
         print("# Cross-fold validation")
         print("###########", end="\n\n")
-        sys.exit()
         scores = mdl.repeated_kfold_validation(x_train, y_train)
 
         sf.save_scores(scores)
 
         print("\nOVER\n")
 
-    #elif args.analyse == "app":
+    elif args.analyse == "app":
         print("###########")
         print("# Apprentissage des modèles")
         print("###########", end="\n\n")
