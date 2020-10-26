@@ -12,7 +12,7 @@ Le **module aioi** a été mis en place et permet de réaliser les réseaux de n
 
 Le dossier **./Models** contient les différents que nous avons obtenu:
 
-- Keras_models: les poids (déterminer après le fit) et l'architecture des modèles sauvegarder dans des fichiers *.h5*
+- Keras_models: les poids (déterminés après le fit) et l'architecture des modèles sauvegardés dans des fichiers *.h5*
 - Neural_network: les plots de l'architecture des différents modèles
 - Optimisation: plot de la loss & val loss pour un ensemble de decay rate pour chaque modèle
 - Submission: les targets prédits
