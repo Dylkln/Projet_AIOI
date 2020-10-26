@@ -6,6 +6,10 @@ Ce projet à pour but de prédire les taux de dégradation probables pour chaque
 
 ## Résultats
 
+Le jupyter notebook **corona_arn.ipynb** renseigne des **analyses** qui ont été menées à bien en détail et présente les **résultats**.
+
+Le **module aioi** a été mis en place et permet de réaliser les réseaux de neurones, l'optimisation des modèles, de vérifier la validité des modèles (repeated k-fold cross-validation), l'apprentissage des modèles à partir d'arn_train, d'évaluer les performances des modèles et la prédiction à partir d'arn_test.
+
 Le dossier **./Models** contient les différents que nous avons obtenu:
 
 - Keras_models: les poids (déterminer après le fit) et l'architecture des modèles sauvegarder dans des fichiers *.h5*
@@ -47,6 +51,28 @@ conda env create --file environment.yml
 ```
 conda activate deep-learning
 ```
+
+3. Utilisation
+
+> Jupyter notebook
+
+```
+jupyter lab
+```
+
+> Programme - être dans le dossier Projet_AIOI
+
+```
+python -m aioi -a <ARG>
+```
+
+avec ARG:
+
+- opt: pour réaliser l'optimisation des réseaux de neurones
+- val: pour réaliser la repeated k-fold cross-validation de chaque modèle
+- app: pour réaliser l'apprentissage de chaque modèle
+- eval: pour évaluer les performances de chaque modèle
+- pred: pour réaliser la prédiction des targets
 
 ## Auteurs
 
