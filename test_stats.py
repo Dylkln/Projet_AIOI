@@ -151,6 +151,63 @@ def save_loop(data_train_deg):
 	loops_deg_50C, loops_deg_error_pH10, loops_deg_error_50C
 
 
+def count_diff_between_two_pred(data_train, jp_pred):
+
+	loops_init = [loop for loop in data_train["predicted_loop_type"]]
+	loops_pred_jp = [loop for loop in jp_pred["loop_pred"]]
+
+	struct_init = [s for s in data_train["structure"]]
+	struct_pred_jp = [s for s in jp_pred["structure_pred"]]
+
+	ids = [i for i in data_train["id"]]
+
+	diff_struct = {}
+	difference_struct = {}
+	
+	for i, struct in enumerate(struct_pred_jp):
+		for j, s in enumerate(struct):
+
+			if ids[i] not in diff_struct.keys():
+				diff_struct[ids[i]] = {}
+				difference_struct[ids[i]] = 0
+			
+				if j not in diff_struct[ids[i]].keys():
+					diff_struct[ids[i]][j] = ""
+		
+			if s != struct_init[i][j]:
+				diff_struct[ids[i]][j] = f"'{s}' --> '{struct_init[i][j]}'"
+				difference_struct[ids[i]] += 1
+
+			else:
+				diff_struct[ids[i]][j] = "="
+
+
+	diff_loop = {}
+	difference_loop = {}
+
+	for i, loop in enumerate(loops_pred_jp):
+		for j, l in enumerate(loop):
+
+			if ids[i] not in diff_loop.keys():
+				diff_loop[ids[i]] = {}
+				difference_loop[ids[i]] = 0
+			
+				if j not in diff_loop[ids[i]].keys():
+					diff_loop[ids[i]][j] = ""
+		
+			if l != loops_init[i][j]:
+				diff_loop[ids[i]][j] = f"{l} --> {loops_init[i][j]}"
+				difference_loop[ids[i]] += 1
+
+			else:
+				diff_loop[ids[i]][j] = "="
+
+	
+	
+
+	return diff_struct, difference_struct, diff_loop, difference_loop
+
+
 def count_dict_loop_seq(loops_seq):
 
 	count_loop_seq = {}
@@ -185,15 +242,35 @@ def calc_mean(dict1, dict2):
 
 def main():
 	
+#	loop type :
+
+#	E = External
+#	I = Internal
+#	B = Bulge
+#	S = Stem-loop
+#	H =	Pseudoknots
+#	X = tetraboucles
+#	M = Multiloop
+
+	
+	##### SAVE DATA #####
+
 	data_train = read_json('./Data/train.json')
 	data_train = data_train.query("SN_filter == 1")
 	
+	jp_pred = pd.read_csv("Data/spotrna_train.tsv", sep = "\t", header = None)
+	jp_pred.columns = ["id_pred", "structure_pred", "loop_pred"]
+
 	data_train_deg = data_train[["sequence", "predicted_loop_type",
 	"reactivity_error", "reactivity", "deg_error_pH10", "deg_error_50C",
 	"deg_pH10", "deg_50C"]]
 
 	data_train = data_train[["index", "id", "sequence", 
 		"structure", "predicted_loop_type"]]
+
+	
+
+	##### CREATE DICT #####
 
 	nt_index_dict = count_nt(data_train)
 
@@ -206,20 +283,14 @@ def main():
 	mean_deg_50C, mean_deg_error_50C = calc_mean(loops_deg_50C, loops_deg_error_50C)
 	mean_deg_pH10, mean_deg_error_pH10 = calc_mean(loops_deg_pH10, loops_deg_error_pH10)
 
-
-#	loop type :
-
-#	E = External
-#	I = Internal
-#	B = Bulge
-#	S = Stem-loop
-#	H =	Pseudoknots
-#	X = tetraboucles
-#	M = Multiloop
-
+	diff_struct, difference_struct, diff_loop, difference_loop = count_diff_between_two_pred(data_train, jp_pred)
 
 	struct_index_dict = count_structure(data_train)
 	loop_index_dict = count_loop_type(data_train)
+
+	
+	##### CREATE DATAFRAME #####
+
 
 	nt_df = pd.DataFrame(nt_index_dict)
 	struct_df = pd.DataFrame(struct_index_dict)
@@ -245,7 +316,19 @@ def main():
 	row9 = pd.Series(data = mean_deg_error_pH10, name = "mean deg error pH10")
 	count_df = count_df.append(row9)
 
+	diff_struct_df = pd.DataFrame(diff_struct)
+	diff_loop_df = pd.DataFrame(diff_loop)
 
+	diff_struct_tot_df = pd.DataFrame.from_dict(difference_struct, orient = "index")
+	diff_loop_tot_df = pd.DataFrame.from_dict(difference_loop, orient = "index")
+	
+
+	##### DATAFRAME TO CSV #####
+
+	diff_struct_df.to_csv("diff_struct.csv", index = True, header = True)
+	diff_loop_df.to_csv("diff_loop.csv", index = True, header = True)
+	diff_struct_tot_df.to_csv("diff_struct_tot.csv", index = True, header = True)
+	diff_loop_tot_df.to_csv("diff_loop_tot.csv", index = True, header = True)
 	count_df.to_csv("count.csv", index = True, header = True)
 	nt_df.to_csv("nt_count.csv", index = True, header = True)
 	struct_df.to_csv("struct_count.csv", index = True, header = True)
