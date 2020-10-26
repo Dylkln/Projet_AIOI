@@ -2,6 +2,20 @@
 
 https://www.kaggle.com/c/stanford-covid-vaccine
 
+Ce projet à pour but de prédire les taux de dégradation probables pour chaque base d'ARN donnés. Des méthodes de deep learning ont été appliquées pour mettre en place différents types de modèles qui seront ensuite utilisés pour réaliser les prédictions.
+
+## Résultats
+
+Le dossier **./Models** contient les différents que nous avons obtenu:
+
+- Keras_models: les poids (déterminer après le fit) et l'architecture des modèles sauvegarder dans des fichiers *.h5*
+- Neural_network: les plots de l'architecture des différents modèles
+- Optimisation: plot de la loss & val loss pour un ensemble de decay rate pour chaque modèle
+- Submission: les targets prédits
+- Summarize_models: plot de la loss & mse de chaque modèle, réalisé après optimisation & validation
+- kfold_validation_scores.txt: Ecart type et moyenne de la loss et du mse obtenu après une étape de repeated k-fold cross-validation pour chaque modèle 
+- models_history.npy: sauvegarde de l'history (loss & mse) de chaque modèle, obtenu après optimisation & validation
+
 ## Prérequis
 
 L'utilisation de [Miniconda3](https://docs.conda.io/en/latest/miniconda.html) est fortement recommandée pour l'utilisation du programme de Deep Learning.
