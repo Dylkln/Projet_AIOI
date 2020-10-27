@@ -55,7 +55,7 @@ def summarize_neural_network(fit_out):
                    show_shapes=True, show_layer_names=True)
 
 
-def summarize_models(history):
+def summarize_models(history, *args):
     print("Plot - model loss & model mse", end="\n\n")
     for mdl in history:
         label = [('loss', 'val_loss'), ('mse', 'val_mse')]
@@ -79,7 +79,10 @@ def summarize_models(history):
 
         fig.suptitle(mdl, fontsize="xx-large")
 
-        name = f"./Models/Summarize_models/{mdl}.png"
+        if args:
+            name = f"./Models/{args[0].capitalize()}_summarize_models/{mdl}.png"
+        else:
+            name = f"./Models/Summarize_models/{mdl}.png"
         plt.savefig(name)
         plt.clf()
 

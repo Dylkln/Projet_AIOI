@@ -9,6 +9,7 @@ Il permet de:
   - Vérifier l'existence du fichier lu
 """
 
+import csv
 import os
 import pandas as pd
 import numpy as np
@@ -79,7 +80,7 @@ def read_npy(fichier):
         return npy_file
 
 
-def load_keras_models():
+def load_keras_models(*args):
     """
     Load les modèles stockés dans des fichier .h5.
 
@@ -89,8 +90,12 @@ def load_keras_models():
       -key: modèle type
       -value: keras model
     """
-    path = "./Models/Keras_models/"
     keras_models = {}
+
+    if args:
+        path = f"./Models/{args[0].capitalize()}_keras_models/"
+    else:
+        path = "./Models/Keras_models/"
 
     for mdl in os.listdir(path):
         file_ = path + mdl
@@ -100,9 +105,31 @@ def load_keras_models():
     return keras_models
 
 
-def load_history():
-    file_ = "./Models/models_history.npy"
+def load_history(*args):
+    if args:
+        file_ = f"./Models/{args[0].capitalize()}_models_history.npy"
+    else:
+        file_ = "./Models/models_history.npy"
     return np.load(file_, allow_pickle=True).item()
+
+
+def read_tsv(arn):
+    """
+    Lis le fichier ./Data/spotrna_train.tsv
+    """
+    with open("./Data/spotrna_train_good.tsv") as filin:
+        f_reader = csv.DictReader(filin, delimiter="\t")
+        data_ = {'structure': [], 'predicted_loop_type': []}
+
+        for row in f_reader:
+            data_['structure'].append(row['structure'])
+            data_['predicted_loop_type'].append(row['predicted_loop_type'])
+
+    data_ = pd.DataFrame(data_)
+
+    arn.update(data_)
+
+    return arn
 
 
 if __name__ == "__main__":

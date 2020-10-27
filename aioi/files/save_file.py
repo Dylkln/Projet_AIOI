@@ -6,7 +6,6 @@ import csv
 import numpy as np
 import sys
 
-
 def save_neural_network_data(name, data):
     """
     Permet de sauvegarder les données d'input & output traitées.
@@ -41,25 +40,35 @@ def save_scores(scores):
             )
 
 
-def save_keras_models(keras_models):
+def save_keras_models(keras_models, *args):
     """
     Save des modèles keras compilés.
     """
     for type_model, model in keras_models.items():
-        file_ = f"./Models/Keras_models/{type_model}.h5"
+        if args:
+            file_ = f"./Models/{args[0].capitalize()}_keras_models/{type_model}.h5"
+        else:
+            file_ = f"./Models/Keras_models/{type_model}.h5"
         model.save(file_)
 
 
-def save_history(history):
+def save_history(history, *args):
     """
     Save de fit_out.history de chaque modèle - loss, val_loss & mse, val_mse
     """
-    file_ = "./Models/models_history.npy"
+    if args:
+        file_ = f"./Models/{args[0].capitalize()}_models_history.npy"
+    else:
+        file_ = "./Models/models_history.npy"
     np.save(file_, history)
 
 
-def save_submission(output, model):
-    file_ = f"Models/Submission/submission-{model}.csv"
+def save_submission(output, model, *args):
+    if args:
+        file_ = f"Models/{args[0].capitalize()}_submission/submission-{model}.csv"
+    else:
+        file_ = f"Models/Submission/submission-{model}.csv"
+
     with open(file_, 'w') as filout:
         fields = [
             'id_seqpos', 'reactivity', 'deg_Mg_pH10', 'deg_pH10', 'deg_Mg_50C',

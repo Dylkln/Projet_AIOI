@@ -38,6 +38,14 @@ def arguments():
                         app pour l'apprentissage
                         eval pour évaluer les performances des modèles
                         pred pour la prédiction""")
+    parser.add_argument('-d', '--data', dest='data', default="classique",
+                        choices=['classique', 'new'],
+                        help="""Le fichier de train à utiliser pour l'apprentissage -
+                         classique réfère au dataframe du projet kaggle arn_train -
+                         new réfère au fichier spotrna_train_good.tsv qui contient
+                        les prédictions que nous avons réalisées des structures et
+                        des loop types
+                        """)
 
     return parser.parse_args()
 
@@ -72,6 +80,9 @@ def main():
         y_train = rf.read_npy("./Data/y_train.npy")
         print("Y_train shape: {}".format(y_train.shape), end="\n\n")
 
+    ###
+    # Modèle keras
+    ###
     if args.analyse == "opt":
         print("###########")
         print("# Optimisation des réseaux de neurones!")
@@ -99,8 +110,19 @@ def main():
         print("# Apprentissage des modèles")
         print("###########", end="\n\n")
 
+        if args.data == "new":
+            # Data sélectionné pour l'apprentissage: spotrna_train_good.tsv
+            # Mis à jour de arn_train
+            new_arn = rf.read_tsv(arn[0].query('SN_filter == 1'))
+            arn_train = data.formatage_x(new_arn)
+            x_train = data.x_input(arn_train)
+
+        sys.exit()
         history, keras_models = mdl.apprentissage(x_train, y_train)
 
+        if args.data == "new":
+            sf.save_history(history, "new")
+            sf.save_keras_models(keras_models, "new")
         sf.save_history(history)
         sf.save_keras_models(keras_models)
 
@@ -112,22 +134,34 @@ def main():
         print("###########", end="\n\n")
 
         # Analyse performance des modèles en apprentissage & test
-        history = rf.load_history()
-        plot.summarize_models(history)
+        if args.data == "new":
+            history = rf.load_history("new")
+            plot.summarize_models(history, "new")
+        else:
+            history = rf.load_history()
+            plot.summarize_models(history)
 
     elif args.analyse == "pred":
         print("###########")
         print("# Prédiction")
         print("###########", end="\n\n")
 
-        keras_models = rf.load_keras_models()
+        if args.data == "new":
+            keras_models = rf.load_keras_models("new")
+        else:
+            keras_models = rf.load_keras_models()
+
         arn_test, x_test = data.new_x(arn[1])
 
         predict = mdl.prediction(x_test, keras_models)
 
         for model in predict:
             output = data.traiter_predict_output(arn_test, predict[model])
-            sf.save_submission(output, model)
+
+            if args.data == "new":
+                sf.save_submission(output, model, "new")
+            else:
+                sf.save_submission(output, model)
 
         print("\nOVER\n")
 
