@@ -1,5 +1,5 @@
 # Modules
-from aioi.files.read_file import read_json
+from files.read_file import read_json
 from statistics import mean
 import pandas as pd
 
@@ -101,6 +101,9 @@ def count_loop_type(data_train):
 
 
 def save_loop(data_train_deg):
+	"""
+
+	"""
 
 	len_deg = len(data_train_deg["deg_50C"][0])
 
@@ -151,8 +154,33 @@ def save_loop(data_train_deg):
 	loops_deg_50C, loops_deg_error_pH10, loops_deg_error_50C
 
 
-def count_diff_between_two_pred(data_train, jp_pred):
+def count_nt_pred_JP(jp_pred, data_train):
+	"""
 
+	"""
+	loops_pred_jp = [loop for loop in jp_pred["loop_pred"]]
+	sequences = [seq for seq in data_train["sequence"]]
+
+	loop_seq = {}
+
+	for i, loop in enumerate(loops_pred_jp):
+		for j, ltype in enumerate(loop):
+			if ltype not in loop_seq.keys():
+				loop_seq[ltype] = []
+
+			loop_seq[ltype].append(sequences[i][j])
+
+
+	count_l_s = count_dict_loop_seq(loop_seq)
+
+
+	return count_l_s
+
+
+def extract_diff_between_two_pred(data_train, jp_pred):
+	"""
+
+	"""
 	loops_init = [loop for loop in data_train["predicted_loop_type"]]
 	loops_pred_jp = [loop for loop in jp_pred["loop_pred"]]
 
@@ -162,54 +190,57 @@ def count_diff_between_two_pred(data_train, jp_pred):
 	ids = [i for i in data_train["id"]]
 
 	diff_struct = {}
-	difference_struct = {}
-	
+	indices = range(108)
+	difference_struct = {}.fromkeys(set(indices), 0)
+
+
+
 	for i, struct in enumerate(struct_pred_jp):
 		for j, s in enumerate(struct):
 
 			if ids[i] not in diff_struct.keys():
 				diff_struct[ids[i]] = {}
-				difference_struct[ids[i]] = 0
 			
 				if j not in diff_struct[ids[i]].keys():
 					diff_struct[ids[i]][j] = ""
-		
+
 			if s != struct_init[i][j]:
 				diff_struct[ids[i]][j] = f"'{s}' --> '{struct_init[i][j]}'"
-				difference_struct[ids[i]] += 1
+				difference_struct[j] += 1
 
 			else:
 				diff_struct[ids[i]][j] = "="
 
 
 	diff_loop = {}
-	difference_loop = {}
+	difference_loop = {}.fromkeys(set(indices), 0)
+
 
 	for i, loop in enumerate(loops_pred_jp):
 		for j, l in enumerate(loop):
 
 			if ids[i] not in diff_loop.keys():
 				diff_loop[ids[i]] = {}
-				difference_loop[ids[i]] = 0
 			
 				if j not in diff_loop[ids[i]].keys():
 					diff_loop[ids[i]][j] = ""
-		
+
 			if l != loops_init[i][j]:
 				diff_loop[ids[i]][j] = f"{l} --> {loops_init[i][j]}"
-				difference_loop[ids[i]] += 1
+				difference_loop[j] += 1
 
 			else:
 				diff_loop[ids[i]][j] = "="
 
 	
 	
-
 	return diff_struct, difference_struct, diff_loop, difference_loop
 
 
 def count_dict_loop_seq(loops_seq):
+	"""
 
+	"""
 	count_loop_seq = {}
 
 	for cle, valeur in loops_seq.items():
@@ -224,7 +255,9 @@ def count_dict_loop_seq(loops_seq):
 
 
 def calc_mean(dict1, dict2):
-	
+	"""
+
+	"""
 	mean_dict1 = {}
 	mean_dict2 = {}
 
@@ -255,10 +288,10 @@ def main():
 	
 	##### SAVE DATA #####
 
-	data_train = read_json('./Data/train.json')
+	data_train = read_json('../Data/train.json')
 	data_train = data_train.query("SN_filter == 1")
 	
-	jp_pred = pd.read_csv("Data/spotrna_train.tsv", sep = "\t", header = None)
+	jp_pred = pd.read_csv("../Data/spotrna_train.tsv", sep = "\t", header = None)
 	jp_pred.columns = ["id_pred", "structure_pred", "loop_pred"]
 
 	data_train_deg = data_train[["sequence", "predicted_loop_type",
@@ -283,14 +316,16 @@ def main():
 	mean_deg_50C, mean_deg_error_50C = calc_mean(loops_deg_50C, loops_deg_error_50C)
 	mean_deg_pH10, mean_deg_error_pH10 = calc_mean(loops_deg_pH10, loops_deg_error_pH10)
 
-	diff_struct, difference_struct, diff_loop, difference_loop = count_diff_between_two_pred(data_train, jp_pred)
+	diff_struct, difference_struct, diff_loop, difference_loop = extract_diff_between_two_pred(data_train, jp_pred)
 
 	struct_index_dict = count_structure(data_train)
 	loop_index_dict = count_loop_type(data_train)
 
+	count_l_s = count_nt_pred_JP(jp_pred, data_train)
 	
 	##### CREATE DATAFRAME #####
 
+	count_ls_JP_df = pd.DataFrame(count_l_s)
 
 	nt_df = pd.DataFrame(nt_index_dict)
 	struct_df = pd.DataFrame(struct_index_dict)
@@ -325,14 +360,15 @@ def main():
 
 	##### DATAFRAME TO CSV #####
 
-	diff_struct_df.to_csv("diff_struct.csv", index = True, header = True)
-	diff_loop_df.to_csv("diff_loop.csv", index = True, header = True)
-	diff_struct_tot_df.to_csv("diff_struct_tot.csv", index = True, header = True)
-	diff_loop_tot_df.to_csv("diff_loop_tot.csv", index = True, header = True)
-	count_df.to_csv("count.csv", index = True, header = True)
-	nt_df.to_csv("nt_count.csv", index = True, header = True)
-	struct_df.to_csv("struct_count.csv", index = True, header = True)
-	loop_df.to_csv("loop_count.csv", index = True, header = True)
+	count_ls_JP_df.to_csv("../Stats/count_new_pred.csv", index = True, header = True)
+	diff_struct_df.to_csv("../Stats/diff_struct.csv", index = True, header = True)
+	diff_loop_df.to_csv("../Stats/diff_loop.csv", index = True, header = True)
+	diff_struct_tot_df.to_csv("../Stats/diff_struct_par_i.csv", index = True, header = True)
+	diff_loop_tot_df.to_csv("../Stats/diff_loop_par_i.csv", index = True, header = True)
+	count_df.to_csv("../Stats/count.csv", index = True, header = True)
+	nt_df.to_csv("../Stats/nt_count.csv", index = True, header = True)
+	struct_df.to_csv("../Stats/struct_count.csv", index = True, header = True)
+	loop_df.to_csv("../Stats/loop_count.csv", index = True, header = True)
 
 if __name__ == '__main__':
 	main()
