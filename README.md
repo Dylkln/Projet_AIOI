@@ -20,6 +20,13 @@ Le dossier **./Models** contient les différents que nous avons obtenu:
 - kfold_validation_scores.txt: Ecart type et moyenne de la loss et du mse obtenu après une étape de repeated k-fold cross-validation pour chaque modèle 
 - models_history.npy: sauvegarde de l'history (loss & mse) de chaque modèle, obtenu après optimisation & validation
 
+On a également redéterminé les prédictions des structures & loop types (spotrna_train_good.tsv), l'apprentissage du modèle et son évaluation ont donc également été menés sur ces données et sont sauvegardés dans:
+
+- New_keras_models: les poids (déterminés après le fit) et l'architecture des modèles sauvegardés dans des fichiers *.h5*
+- New_submission: les targets prédits
+- New_summarize_models: plot de la loss & mse de chaque modèle, réalisé après optimisation & validation
+- New_models_history.npy: sauvegarde de l'history (loss & mse) de chaque modèle, obtenu après optimisation & validation
+
 ## Prérequis
 
 L'utilisation de [Miniconda3](https://docs.conda.io/en/latest/miniconda.html) est fortement recommandée pour l'utilisation du programme de Deep Learning.
