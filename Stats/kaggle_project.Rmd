@@ -1,0 +1,238 @@
+---
+title: "Kaggle Project"
+author: "KLEIN Dylan"
+date: "23/10/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r modules}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("mixOmics")
+```
+
+
+```{r imports}
+library(mixOmics)
+```
+
+
+
+Préparation des données
+
+```{r}
+indices = seq(1:107)
+
+train_nt = read.csv("nt_count.csv")
+rownames(train_nt) = train_nt[,1]
+train_nt = train_nt[,-1]
+colnames(train_nt) = indices
+
+train_loop = read.csv("loop_count.csv")
+rownames(train_loop) = train_loop[,1]
+train_loop = train_loop[,-1]
+colnames(train_loop) = indices
+
+train_struct = read.csv("struct_count.csv")
+rownames(train_struct) = train_struct[,1]
+train_struct = train_struct[,-1]
+colnames(train_struct) = indices
+```
+
+```{r}
+train_nt_prop = round(train_nt[,] / 1589, 4)
+train_loop_prop = round(train_loop[,] / 1589, 4)
+train_struct_prop = round(train_struct[,] / 1589, 4)
+```
+
+```{r}
+train_nt_prop = as.matrix(train_nt_prop)
+train_loop_prop = as.matrix(train_loop_prop)
+train_struct_prop = as.matrix(train_struct_prop)
+```
+
+
+Création des graphes
+
+```{r}
+pdf("trainntprop.pdf")
+cim(train_nt_prop, cluster = "none")
+dev.off()
+```
+
+
+```{r}
+pdf("trainloopprop.pdf")
+cim(train_loop_prop, cluster = "none")
+dev.off()
+```
+
+```{r}
+pdf("trainstructprop.pdf")
+cim(train_struct_prop, cluster = "none")
+dev.off()
+```
+
+
+-----------------------------------------------------------------------------
+
+Entropie de Shannon
+
+plus l'entropie est proche de 0, moins les nucléotides de la position varient.
+Si l'entropie est de 0, il n'y a qu'un nucléotide sur la position donnée.
+Si l'entropie est de 1, il y a les 4 nucléotides present équitablement sur la position donnée (1/4 de A, 1/4 de G, 1/4 de C, 1/4 de U)
+
+```{r}
+shannon_entropy_draft = round(- train_nt_prop[,] * log(train_nt_prop[,], base = 4), 4)
+shannon_entropy = colSums(shannon_entropy_draft, na.rm = TRUE)
+shannon_entropy
+```
+
+-----------------------------------------------------------------------------
+
+Pourcentages GC:
+
+
+```{r}
+percent_GC_E = round((4644 + 1026) / sum(4644, 10802, 1426, 1073), 4)
+percent_GC_S = round((18844 + 16418) / sum(18844, 9958, 16418, 12378), 4)
+percent_GC_H = round((2964 + 1691) / sum(2964, 6984, 1691, 2031), 4)
+percent_GC_B = round((292 + 312) / sum(292, 1272, 312, 348), 4)
+percent_GC_X = round((642 + 423) / sum(642, 2518, 423, 502), 4)
+percent_GC_I = round((2831 + 930) / sum(2831, 4134, 930, 990), 4)
+percent_GC_M = round((551 + 359) / sum(551, 2285, 359, 450), 4)
+```
+
+-----------------------------------------------------------------------------
+
+Compte du nombre de G, A, C, U pour chaque loop type
+
+```{r}
+loop_E = c(4644, 10802, 1426, 1073)
+loop_S = c(18844, 9958, 16418, 12378)
+loop_H = c(2964, 6984, 1691, 2031)
+loop_B = c(292, 1272, 312, 348)
+loop_X = c(642, 2518, 423, 502)
+loop_I = c(2831, 4134, 930, 990)
+loop_M = c(551, 2285, 359, 450)
+p = c(0.25, 0.25, 0.25, 0.25)
+```
+
+
+Test du Chi-Squared:
+
+loop type :
+
+E ==> External / Boucle externe
+I ==> Internal / Boucle interne
+B ==> Bulge / Hernie
+S ==> Stem-loop / Tige-Boucle
+H ==>	Pseudoknots / Pseudonoeuds
+X ==> tetraboucles / Tetraboucles hyperstables
+M ==> Multiloop / Boucles multiples
+
+
+Indices :
+
+1 ==> G
+2 ==> A
+3 ==> C
+4 ==> U
+
+
+```{r}
+res = chisq.test(x = loop_E, p = p)
+res
+res$expected[1]
+which(loop_E > res$expected[1])
+which(loop_E < res$expected[1])
+```
+pour la loop_E:
+
+- les nucléotides sur représentés sont : G et A
+- les nucléotides sous représentés sont : C et U
+
+-----------------------------------------------------------------------------
+
+```{r}
+res = chisq.test(x = loop_S, p = p)
+res
+res$expected[1]
+which(loop_S > res$expected[1])
+which(loop_S < res$expected[1])
+```
+pour la loop_S:
+
+- les nucléotides sur représentés sont : G et C
+- les nucléotides sous représentés sont : A et U
+
+-----------------------------------------------------------------------------
+
+```{r}
+res = chisq.test(loop_H, p = p)
+res
+res$expected[1]
+which(loop_H > res$expected[1])
+which(loop_H < res$expected[1])
+```
+pour la loop_H:
+
+- le nucléotide sur représenté est : A
+- les nucléotides sous représentés sont : G, C et U
+
+-----------------------------------------------------------------------------
+
+```{r}
+res = chisq.test(loop_B, p = p)
+res
+res$expected[1]
+which(loop_B > res$expected[1])
+which(loop_B < res$expected[1])
+```
+pour la loop_B:
+- le nucléotide sur représenté est : A
+- les nucléotides sous représentés sont : G, C et U
+
+-----------------------------------------------------------------------------
+
+```{r}
+res = chisq.test(loop_X, p = p)
+res
+res$expected[1]
+which(loop_X > res$expected[1])
+which(loop_X < res$expected[1])
+```
+pour la loop_X:
+- le nucléotide sur représenté est : A
+- les nucléotides sous représentés sont : G, C et U
+
+-----------------------------------------------------------------------------
+
+```{r}
+res = chisq.test(loop_I, p = p)
+res
+res$expected[1]
+which(loop_I > res$expected[1])
+which(loop_I < res$expected[1])
+```
+pour la loop_I:
+- les nucléotides sur représentés sont : G et A
+- les nucléotides sous représentés sont : C et U
+
+-----------------------------------------------------------------------------
+
+```{r}
+res = chisq.test(loop_M, p = p)
+res
+res$expected[1]
+which(loop_M > res$expected[1])
+which(loop_M < res$expected[1])
+```
+pour la loop_M:
+- le nucléotide sur représenté est : A
+- les nucléotides sous représentés sont : G, C et U
