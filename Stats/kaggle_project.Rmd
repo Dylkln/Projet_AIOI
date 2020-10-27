@@ -236,3 +236,189 @@ which(loop_M < res$expected[1])
 pour la loop_M:
 - le nucléotide sur représenté est : A
 - les nucléotides sous représentés sont : G, C et U
+
+-----------------------------------------------------------------------------
+
+Dans cette seconde partie, nous testerons les nouvelles prédictions réalisés par Julien PICHON
+
+Read data - Mise en forme des data
+
+```{r}
+comp_nt = read.csv("count_new_pred.csv")
+rownames(comp_nt) = comp_nt$X.1
+comp_nt = comp_nt[,-1]
+```
+
+-----------------------------------------------------------------------------
+
+Pourcentages_GC
+
+
+```{r}
+percent_GC_E_jp = round((comp_nt$E[1] + comp_nt$E[3]) / sum(comp_nt$E), 4)
+percent_GC_S_jp = round((comp_nt$S[1] + comp_nt$S[3]) / sum(comp_nt$S), 4)
+percent_GC_H_jp = round((comp_nt$H[1] + comp_nt$H[3]) / sum(comp_nt$H), 4)
+percent_GC_B_jp = round((comp_nt$B[1] + comp_nt$B[3]) / sum(comp_nt$B), 4)
+percent_GC_X_jp = round((comp_nt$X[1] + comp_nt$X[3]) / sum(comp_nt$X), 4)
+percent_GC_I_jp = round((comp_nt$I[1] + comp_nt$I[3]) / sum(comp_nt$I), 4)
+percent_GC_M_jp = round((comp_nt$M[1] + comp_nt$M[3]) / sum(comp_nt$M), 4)
+
+percent_GC_E_jp
+percent_GC_S_jp
+percent_GC_H_jp
+percent_GC_B_jp
+percent_GC_X_jp
+percent_GC_I_jp
+percent_GC_M_jp
+```
+
+-----------------------------------------------------------------------------
+
+Test du Chi-Squared:
+
+loop type :
+
+E ==> External / Boucle externe
+I ==> Internal / Boucle interne
+B ==> Bulge / Hernie
+S ==> Stem-loop / Tige-Boucle
+H ==>	Pseudoknots / Pseudonoeuds
+X ==> tetraboucles / Tetraboucles hyperstables
+M ==> Multiloop / Boucles multiples
+
+
+```{r}
+loop_E_jp = c(comp_nt$E[1], comp_nt$E[2], comp_nt$E[3], comp_nt$E[4])
+loop_S_jp = c(comp_nt$S[1], comp_nt$S[2], comp_nt$S[3], comp_nt$S[4])
+loop_H_jp = c(comp_nt$H[1], comp_nt$H[2], comp_nt$H[3], comp_nt$H[4])
+loop_B_jp = c(comp_nt$B[1], comp_nt$B[2], comp_nt$B[3], comp_nt$B[4])
+loop_X_jp = c(comp_nt$X[1], comp_nt$X[2], comp_nt$X[3], comp_nt$X[4])
+loop_I_jp = c(comp_nt$I[1], comp_nt$I[2], comp_nt$I[3], comp_nt$I[4])
+loop_M_jp = c(comp_nt$M[1], comp_nt$M[2], comp_nt$M[3], comp_nt$M[4])
+p = c(0.25, 0.25, 0.25, 0.25)
+```
+
+Indices :
+
+1 ==> G
+2 ==> A
+3 ==> C
+4 ==> U
+
+```{r}
+res = chisq.test(x = loop_E_jp, p = p)
+res
+res$expected[1]
+which(loop_E_jp > res$expected[1])
+which(loop_E_jp < res$expected[1])
+```
+pour la loop_E_jp:
+
+- le nucléotide sur représenté est : A
+- les nucléotides sous représentés sont : G, C et U
+
+-----------------------------------------------------------------------------
+
+```{r}
+res = chisq.test(x = loop_S_jp, p = p)
+res
+res$expected[1]
+which(loop_S_jp > res$expected[1])
+which(loop_S_jp < res$expected[1])
+```
+pour la loop_S_jp:
+
+- les nucléotides sur représentés sont : G et C
+- les nucléotides sous représentés sont : A et U
+
+-----------------------------------------------------------------------------
+
+```{r}
+res = chisq.test(loop_H_jp, p = p)
+res
+res$expected[1]
+which(loop_H_jp > res$expected[1])
+which(loop_H_jp < res$expected[1])
+```
+pour la loop_H_jp:
+
+- le nucléotide sur représenté est : A
+- les nucléotides sous représentés sont : G, C et U
+
+-----------------------------------------------------------------------------
+
+```{r}
+res = chisq.test(loop_B_jp, p = p)
+res
+res$expected[1]
+which(loop_B_jp > res$expected[1])
+which(loop_B_jp < res$expected[1])
+```
+pour la loop_B_jp:
+
+- le nucléotide sur représenté est : A
+- les nucléotides sous représentés sont : G, C et U
+
+-----------------------------------------------------------------------------
+
+```{r}
+res = chisq.test(loop_X_jp, p = p)
+res
+res$expected[1]
+which(loop_X_jp > res$expected[1])
+which(loop_X_jp < res$expected[1])
+```
+
+pour la loop_X_jp:
+
+- les nucléotides sur représentés sont : G et A
+- les nucléotides sous représentés sont : C et U
+
+-----------------------------------------------------------------------------
+
+```{r}
+res = chisq.test(loop_I_jp, p = p)
+res
+res$expected[1]
+which(loop_I_jp > res$expected[1])
+which(loop_I_jp < res$expected[1])
+```
+
+pour la loop_I_jp:
+
+- les nucléotides sur représentés sont : G et A
+- les nucléotides sous représentés sont : C et U
+
+-----------------------------------------------------------------------------
+
+```{r}
+res = chisq.test(loop_M_jp, p = p)
+res
+res$expected[1]
+which(loop_M_jp > res$expected[1])
+which(loop_M_jp < res$expected[1])
+```
+
+pour la loop_M_jp:
+
+- les nucléotides sur représentés sont : G et A
+- les nucléotides sous représentés sont : C et U
+
+-----------------------------------------------------------------------------
+
+Graphiques des différences entre les deux prédictions.
+
+
+```{r}
+diff_loop = read.csv("diff_loop_par_i.csv")
+diff_loop = diff_loop[,-1]
+diff_struct = read.csv("diff_struct_par_i.csv")
+diff_struct = diff_struct[,-1]
+```
+
+
+```{r}
+barplot(diff_loop, col = "grey", xlab = "Position", ylab = "Nombre de différences", main = "Nombre de différence par position pour les structures \n et les loops types prédites")
+barplot(diff_struct, col = rgb(red = 1, green = 0, blue = 0, alpha = 0.5), add = TRUE)
+```
+
