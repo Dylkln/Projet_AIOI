@@ -190,7 +190,7 @@ def extract_diff_between_two_pred(data_train, jp_pred):
 	ids = [i for i in data_train["id"]]
 
 	diff_struct = {}
-	indices = range(108)
+	indices = range(107)
 	difference_struct = {}.fromkeys(set(indices), 0)
 
 
