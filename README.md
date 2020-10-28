@@ -70,7 +70,7 @@ jupyter lab
 > Programme - être dans le dossier Projet_AIOI
 
 ```
-python -m aioi -a <ARG>
+python -m aioi -a <ARG> -d <DATA>
 ```
 
 avec ARG:
@@ -80,6 +80,11 @@ avec ARG:
 - app: pour réaliser l'apprentissage de chaque modèle
 - eval: pour évaluer les performances de chaque modèle
 - pred: pour réaliser la prédiction des targets
+
+avec DATA - optionnel:
+
+- classique (par défaut): réfère au dataframe du projet kaggle arn_train
+- new: réfère au fichier spotrna_train_good.tsv qui contient les prédictions que nous avons réalisées des structures et des loop types
 
 ## Auteurs
 
