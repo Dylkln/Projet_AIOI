@@ -277,12 +277,12 @@ def main():
 	
 #	loop type :
 
-#	E = External
+#	E = End
 #	I = Internal
 #	B = Bulge
 #	S = Stem-loop
-#	H =	Pseudoknots
-#	X = tetraboucles
+#	H = hairpin
+#	X = external
 #	M = Multiloop
 
 	
