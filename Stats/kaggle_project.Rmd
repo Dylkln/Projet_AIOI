@@ -128,13 +128,13 @@ Test du Chi-Squared:
 
 loop type :
 
-E ==> External / Boucle externe
-I ==> Internal / Boucle interne
-B ==> Bulge / Hernie
-S ==> Stem-loop / Tige-Boucle
-H ==>	Pseudoknots / Pseudonoeuds
-X ==> tetraboucles / Tetraboucles hyperstables
-M ==> Multiloop / Boucles multiples
+E ==> End
+I ==> Internal
+B ==> Bulge
+S ==> Stem-loop
+H ==> Hairpin
+X ==> External
+M ==> Multiloop
 
 
 Indices :
